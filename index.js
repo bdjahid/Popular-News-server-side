@@ -28,6 +28,15 @@ async function run() {
         // Connect the client to the server	(optional starting in v4.7)
         // await client.connect();
         const newsCollection = client.db('popular-news').collection('news');
+        const userCollection = client.db('popular-news').collection('users');
+
+
+        // user related api
+        app.post('/users', async (req, res) => {
+            const user = req.body;
+            const result = await userCollection.insertOne(user);
+            res.send(result)
+        })
 
 
 
@@ -39,6 +48,9 @@ async function run() {
             let query = {}
             if (req.query.search) {
                 query = { title: { $regex: filter.search, $options: 'i' } }
+            }
+            if (req.query.search) {
+                query = { name: { $regex: filter.search, $options: 'i' } }
             }
             const cursor = newsCollection.find(query);
             const result = await cursor.toArray();
