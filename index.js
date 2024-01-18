@@ -35,7 +35,7 @@ async function run() {
 
         app.get('/news', async (req, res) => {
             const filter = req.query;
-            // console.log(filter)
+            console.log(filter)
             let query = {}
             if (req.query.search) {
                 query = { title: { $regex: filter.search, $options: 'i' } }
@@ -49,6 +49,12 @@ async function run() {
             const id = req.params.id;
             const query = { _id: new ObjectId(id) }
             const result = await newsCollection.findOne(query)
+            res.send(result)
+        })
+
+        app.post('/news', async (req, res) => {
+            const item = req.body;
+            const result = await newsCollection.insertOne(item);
             res.send(result)
         })
 
