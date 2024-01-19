@@ -32,8 +32,19 @@ async function run() {
 
 
         // user related api
+        app.get('/users', async (req, res) => {
+            // console.log("inside verify token", req.headers);
+            const result = await userCollection.find().toArray();
+            res.send(result)
+        })
+
         app.post('/users', async (req, res) => {
             const user = req.body;
+            const query = { email: user.email }
+            const existingUser = await userCollection.findOne(query);
+            if (existingUser) {
+                return res.send({ message: 'user already exists', insertedId: null })
+            }
             const result = await userCollection.insertOne(user);
             res.send(result)
         })
@@ -50,7 +61,7 @@ async function run() {
                 query = { title: { $regex: filter.search, $options: 'i' } }
             }
             if (req.query.search) {
-                query = { name: { $regex: filter.search, $options: 'i' } }
+                query = { title: { $regex: filter.search, $options: 'i' } }
             }
             const cursor = newsCollection.find(query);
             const result = await cursor.toArray();
@@ -69,6 +80,15 @@ async function run() {
             const result = await newsCollection.insertOne(item);
             res.send(result)
         })
+
+
+        // page count
+        app.get('/newsCount', async (req, res) => {
+            const count = await newsCollection.estimatedDocumentCount();
+            res.send({ count })
+        })
+
+
 
         // Send a ping to confirm a successful connection
         // await client.db("admin").command({ ping: 1 });
