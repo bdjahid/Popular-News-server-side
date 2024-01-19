@@ -55,16 +55,24 @@ async function run() {
 
         app.get('/news', async (req, res) => {
             const filter = req.query;
-            console.log(filter)
+            const page = parseInt(filter.page)
+            const size = parseInt(filter.size)
+            console.log(filter, page, size)
             let query = {}
             if (req.query.search) {
                 query = { title: { $regex: filter.search, $options: 'i' } }
             }
-            if (req.query.search) {
-                query = { title: { $regex: filter.search, $options: 'i' } }
-            }
+            // if (req.query.search) {
+            //     query = { tags: { $regex: filter.search, $options: 'i' } }
+            // }
+            // if (req.query.search) {
+            //     query = { publisher_name: { $regex: filter.search, $options: 'i' } }
+            // }
             const cursor = newsCollection.find(query);
-            const result = await cursor.toArray();
+            const result = await cursor
+                .skip(page * size)
+                .limit(size)
+                .toArray();
             res.send(result)
         })
 
@@ -92,7 +100,7 @@ async function run() {
 
         // Send a ping to confirm a successful connection
         // await client.db("admin").command({ ping: 1 });
-        console.log("Pinged your deployment. You successfully connected to MongoDB!");
+        // console.log("Pinged your deployment. You successfully connected to MongoDB!");
     } finally {
         // Ensures that the client will close when you finish/error
         // await client.close();
