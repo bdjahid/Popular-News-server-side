@@ -49,7 +49,26 @@ async function run() {
             res.send(result)
         })
 
+        app.patch('/users/:id', async (req, res) => {
+            const id = req.params.id;
+            console.log('patch', id)
+            const filter = { _id: new ObjectId(id) };
+            const updateDoc = {
+                $set: {
+                    role: 'admin'
+                }
+            }
+            const result = await userCollection.updateOne(filter, updateDoc);
+            res.send(result)
+        })
 
+        app.delete('/users/:id', async (req, res) => {
+            const id = req.params.id;
+            // console.log('users', id)
+            const query = { _id: new ObjectId(id) }
+            const result = await userCollection.deleteOne(query);
+            res.send(result)
+        })
 
         // news related api
 
